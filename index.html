@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financiera Bashe — Sistema Integral de Créditos</title>
+    <meta name="description" content="Sistema de gestión de préstamos con verificación RENIEC/SUNAT, cuadre de caja y comprobantes.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="viewLanding">
+
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="#" class="brand">
+                <span class="logo">FB</span>
+                <span class="brand-text">Financiera Bashe</span>
+            </a>
+            <div class="nav-links">
+                <a href="#servicios" class="nav-link">Servicios</a>
+                <a href="#simulador" class="nav-link">Simulador</a>
+                <a href="#contacto" class="nav-link">Contacto</a>
+                <button class="btn btn-primary" onclick="mostrarLogin()">Ingresar</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container hero-grid">
+            <div class="hero-text">
+                <h1>Créditos claros.<br>Caja cuadrada.<br>Todo en control.</h1>
+                <p class="hero-subtitle">Sistema integral de préstamos con verificación RENIEC/SUNAT, cuadre de caja profesional, pagos mixtos y comprobantes automáticos.</p>
+                <div class="hero-badges">
+                    <span class="badge badge-gold">✓ Mora 1% mensual</span>
+                    <span class="badge">✓ Comprobantes PDF</span>
+                    <span class="badge">✓ Cuadre efectivo + cuenta</span>
+                    <span class="badge">✓ Pagos mixtos</span>
+                    <span class="badge">✓ Detección PEP</span>
+                </div>
+                <div class="hero-actions">
+                    <button class="btn btn-primary btn-lg" onclick="scrollTo('simulador')">📊 Simular cuota</button>
+                    <button class="btn btn-outline btn-lg" onclick="mostrarLogin()">🔐 Panel Admin</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <span class="stat-number">+5k</span>
+                        <div class="stat-label">Clientes</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">115%</span>
+                        <div class="stat-label">TEA máxima BCRP</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">24/7</span>
+                        <div class="stat-label">Sistema online</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulator-card">
+                <div class="card-header">
+                    <span class="card-icon">🧮</span>
+                    <div>
+                        <div class="card-title">Simulador rápido</div>
+                        <div class="card-subtitle">Calcula tu cuota estimada</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Monto del préstamo (S/)</label>
+                    <input type="number" id="simMonto" value="5000" min="100" step="100">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Plazo (meses)</label>
+                        <input type="number" id="simPlazo" value="12" min="1" max="60">
+                    </div>
+                    <div class="form-group">
+                        <label>TEA (%) <span class="hint">Máx 115.14%</span></label>
+                        <input type="number" id="simTEA" value="24" min="1" max="115.14" step="0.01">
+                    </div>
+                </div>
+                <div class="tem-display">
+                    <span>T.E.M.:</span>
+                    <span class="value" id="simTEM">1.81%</span>
+                </div>
+                <button class="btn btn-primary btn-block" style="margin-top:var(--space-md);" onclick="calcularSimulador()">Calcular cuota</button>
+                <div id="simResultado" class="result-box hidden">
+                    <div class="result-main" id="simCuotaTexto">S/ 0.00</div>
+                    <div class="result-detail" id="simDetalleTexto"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="servicios" class="section" style="background: var(--bg-dark);">
+        <div class="container">
+            <div class="section-header">
+                <h2>Servicios del Sistema</h2>
+                <p>Todo lo que necesitas para gestionar préstamos profesionalmente</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🔍</div>
+                    <h3>Verificación RENIEC/SUNAT</h3>
+                    <p>Consulta automática de DNI y RUC con API oficial. Detección de PEP incluida.</p>
+                    <span class="service-badge">API integrada</span>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">💳</div>
+                    <h3>Registro de Pagos</h3>
+                    <p>Pagos mixtos: efectivo + tarjeta/transferencia. Mora automática del 1% mensual.</p>
+                    <span class="service-badge">Pagos parciales</span>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🧾</div>
+                    <h3>Comprobantes</h3>
+                    <p>Genera e imprime comprobantes de pago automáticamente con cada transacción.</p>
+                    <span class="service-badge">Imprimible</span>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📦</div>
+                    <h3>Cuadre de Caja</h3>
+                    <p>Control separado de efectivo y cuenta bancaria. Cierre diario profesional.</p>
+                    <span class="service-badge">2 cajas</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="simulador" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Simulador Detallado</h2>
+                <p>Genera el cronograma completo de pagos</p>
+            </div>
+            <div class="card" style="max-width:800px;margin:0 auto;">
+                <button class="btn btn-primary" onclick="generarCronogramaSimulador()">📋 Generar cronograma completo</button>
+                <div id="cronogramaSimulador" class="hidden" style="margin-top:var(--space-lg);">
+                    <div class="table-wrap">
+                        <table id="tablaCronograma">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Cuota</th>
+                                <th>Interés</th>
+                                <th>Amortización</th>
+                                <th>Saldo</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contacto" class="section" style="background: var(--bg-dark);">
+        <div class="container">
+            <div class="section-header">
+                <h2>Contacto</h2>
+                <p>¿Necesitas implementar este sistema en tu financiera?</p>
+            </div>
+            <div class="card" style="max-width:500px;margin:0 auto;text-align:center;">
+                <p style="margin-bottom:var(--space-md);">Este sistema puede adaptarse con backend real, integración WhatsApp, SMS, reportes avanzados y más.</p>
+                <p class="muted">📍 Trujillo, Perú | 📧 contacto@financierabashe.com</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-brand">
+                <span class="logo" style="width:32px;height:32px;font-size:0.8rem;">FB</span>
+                <span>Financiera Bashe</span>
+            </div>
+            <p>© <span id="footerYear">2025</span> — Todos los derechos reservados</p>
+            <p class="footer-legal">Sistema demostrativo. Tasa máxima regulada por BCRP: 115.14% TEA (MN). Cumplimiento SBS.</p>
+        </div>
+    </footer>
+</div>
+
+<div id="viewLogin" class="hidden">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">FB</div>
+                <h1>Financiera Bashe</h1>
+                <p class="auth-subtitle">Panel de Administración</p>
+            </div>
+
+            <form onsubmit="return hacerLogin(event)">
+                <div class="form-group">
+                    <label>Usuario</label>
+                    <div class="input-icon-wrap">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="loginUser" placeholder="Ingrese usuario" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <div class="input-icon-wrap">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="loginPass" placeholder="Ingrese contraseña" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg" id="btnLogin">
+                    <span id="btnLoginText">Iniciar Sesión</span>
+                    <span id="btnLoginSpinner" class="spinner hidden"></span>
+                </button>
+                <div id="loginMsg" class="alert hidden" style="margin-top:var(--space-md);"></div>
+            </form>
+
+            <button class="btn btn-outline btn-block" style="margin-top:var(--space-md);" onclick="volverLanding()">← Volver al inicio</button>
+        </div>
+    </div>
+</div>
+
+<div id="viewPanel" class="hidden">
+    <div class="panel-container">
+
+        <div class="panel-topbar">
+            <div class="panel-brand">
+                <span class="logo" style="width:36px;height:36px;font-size:0.9rem;">FB</span>
+                <span style="font-weight:700;">Panel Admin</span>
+                <span class="muted" id="panelUserName"></span>
+            </div>
+            <div class="panel-tabs">
+                <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+                <button class="tab-btn" data-tab="prestamos" onclick="switchTab('prestamos')">💳 Préstamos</button>
+                <button class="tab-btn" data-tab="pagos" onclick="switchTab('pagos')">💵 Pagos</button>
+                <button class="tab-btn" data-tab="caja" onclick="switchTab('caja')">📦 Caja</button>
+                <button class="tab-btn" onclick="cerrarSesion()" style="color:var(--error);">⬅ Salir</button>
+            </div>
+        </div>
+
+        <div class="panel-content">
+
+            <div id="tab-dashboard" class="tab-content active">
+                <h2 style="margin-bottom:var(--space-lg);color:var(--gold);">👋 Bienvenido al Panel</h2>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="icon">📊</div>
+                        <div class="number" id="statTotal">0</div>
+                        <div class="label">Préstamos totales</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="icon">✅</div>
+                        <div class="number" id="statActivos">0</div>
+                        <div class="label">Activos</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="icon">🏁</div>
+                        <div class="number" id="statCancelados">0</div>
+                        <div class="label">Cancelados</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="icon">💰</div>
+                        <div class="number" id="statCapital">S/ 0</div>
+                        <div class="label">Capital activo</div>
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="switchTab('prestamos')">💳 Ir a Préstamos</button>
+                    <button class="btn btn-outline" onclick="switchTab('caja')">📦 Ver Caja</button>
+                    <button class="btn btn-outline" onclick="volverLanding()">🏠 Ver Landing</button>
+                </div>
+            </div>
+
+            <div id="tab-prestamos" class="tab-content">
+                <h2 style="margin-bottom:var(--space-lg);color:var(--gold);">💳 Sistema de Préstamos</h2>
+
+                <div class="two-cols">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon">🔍</span>
+                            <div>
+                                <div class="card-title">Verificación de Cliente</div>
+                                <div class="card-subtitle">Consulta RENIEC (DNI) o SUNAT (RUC)</div>
+                            </div>
+                        </div>
+
+                        <div class="query-tabs">
+                            <button class="query-tab active" id="tabDNI" onclick="cambiarTipoConsulta('dni')">DNI</button>
+                            <button class="query-tab" id="tabRUC" onclick="cambiarTipoConsulta('ruc')">RUC</button>
+                        </div>
+
+                        <div id="seccionDNI">
+                            <div class="form-group">
+                                <label>Número de DNI</label>
+                                <input type="text" id="inputDNI" maxlength="8" placeholder="8 dígitos" onkeypress="if(event.key==='Enter')verificarCliente()">
+                            </div>
+                        </div>
+
+                        <div id="seccionRUC" class="hidden">
+                            <div class="form-group">
+                                <label>Número de RUC</label>
+                                <input type="text" id="inputRUC" maxlength="11" placeholder="11 dígitos" onkeypress="if(event.key==='Enter')verificarCliente()">
+                            </div>
+                        </div>
+
+                        <div style="display:flex;gap:var(--space-sm);">
+                            <button class="btn btn-primary" style="flex:1;" onclick="verificarCliente()" id="btnVerificar">
+                                <span id="btnVerificarText">🔍 Verificar API</span>
+                                <span id="btnVerificarSpinner" class="spinner hidden"></span>
+                            </button>
+                            <button class="btn btn-outline" onclick="abrirModalManual()">✍️ Manual</button>
+                        </div>
+
+                        <div id="verificacionMsg" class="alert hidden" style="margin-top:var(--space-md);"></div>
+
+                        <div id="alertaPEP" class="pep-warning hidden">
+                            <strong>⚠️ ALERTA: Posible PEP</strong>
+                            Este cliente requiere debida diligencia reforzada según Res. SBS N° 4349-2016.
+                        </div>
+
+                        <div id="clienteVerificado" class="customer-result hidden">
+                            <h4>✅ Cliente verificado</h4>
+                            <p><strong>Nombre:</strong> <span id="vNombre"></span></p>
+                            <p><strong>Documento:</strong> <span id="vDocumento"></span></p>
+                            <p><strong>Tipo:</strong> <span id="vTipo"></span></p>
+                            <p><strong>Dirección:</strong> <span id="vDireccion"></span></p>
+                            <p id="vOrigenManual" class="hidden"><span class="badge">📝 Registro manual</span></p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon">📝</span>
+                            <div>
+                                <div class="card-title">Registrar Préstamo</div>
+                                <div class="card-subtitle">Datos del crédito</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Monto (S/)</label>
+                                <input type="number" id="regMonto" min="100" step="50" placeholder="Ej: 5000">
+                            </div>
+                            <div class="form-group">
+                                <label>TEA (%) <span class="hint">Máx 115.14%</span></label>
+                                <input type="number" id="regTEA" value="24" min="1" max="115.14" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="tem-display" style="margin-bottom:var(--space-md);">
+                            <span>T.E.M.:</span>
+                            <span class="value" id="regTEM">1.81%</span>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Plazo (meses)</label>
+                                <input type="number" id="regPlazo" value="12" min="1" max="60">
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha desembolso</label>
+                                <input type="date" id="regFecha">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Analista de crédito *</label>
+                            <input type="text" id="regAnalista" placeholder="Nombre del analista">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Celular cliente *</label>
+                                <input type="tel" id="regCelular" placeholder="9 dígitos" maxlength="9" pattern="[0-9]{9}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Correo</label>
+                                <input type="email" id="regCorreo" placeholder="correo@ejemplo.com">
+                            </div>
+                        </div>
+
+                        <div class="checkbox-wrap">
+                            <input type="checkbox" id="regTerminos">
+                            <label for="regTerminos">Acepto los <a href="#" onclick="mostrarTerminos();return false;">términos y condiciones</a> del préstamo</label>
+                        </div>
+
+                        <button class="btn btn-primary btn-block" onclick="registrarPrestamo()" id="btnRegistrar" disabled>
+                            ✅ Registrar Préstamo
+                        </button>
+
+                        <div id="registroMsg" class="alert hidden" style="margin-top:var(--space-md);"></div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:var(--space-lg);">
+                    <div class="card-header">
+                        <span class="card-icon">📋</span>
+                        <div>
+                            <div class="card-title">Préstamos Registrados</div>
+                            <div class="card-subtitle"><span id="contadorPrestamos">0</span> préstamos</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="max-width:300px;">
+                        <input type="text" id="buscarPrestamo" placeholder="🔍 Buscar cliente, documento..." oninput="filtrarPrestamos()">
+                    </div>
+
+                    <div id="listaPrestamos" class="loans-grid">
+                        <p class="muted" style="text-align:center;padding:var(--space-lg);">No hay préstamos registrados</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-pagos" class="tab-content">
+                <h2 style="margin-bottom:var(--space-lg);color:var(--gold);">💵 Historial de Pagos</h2>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">🧾</span>
+                        <div>
+                            <div class="card-title">Pagos Registrados</div>
+                            <div class="card-subtitle">Todos los pagos con comprobantes</div>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Total</th>
+                                <th>Mora</th>
+                                <th>Efectivo</th>
+                                <th>Cuenta</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tablaPagos">
+                            <tr><td colspan="8" style="text-align:center;">Sin pagos registrados</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-caja" class="tab-content">
+                <h2 style="margin-bottom:var(--space-lg);color:var(--gold);">📦 Cuadre de Caja</h2>
+
+                <div class="caja-totals">
+                    <div class="caja-card efectivo">
+                        <div class="caja-icon">💵</div>
+                        <div class="caja-amount" id="cajaEfectivo">S/ 0.00</div>
+                        <div class="caja-label">Efectivo en caja</div>
+                    </div>
+                    <div class="caja-card cuenta">
+                        <div class="caja-icon">🏦</div>
+                        <div class="caja-amount" id="cajaCuenta">S/ 0.00</div>
+                        <div class="caja-label">Cuenta bancaria</div>
+                    </div>
+                    <div class="caja-card total">
+                        <div class="caja-icon">📊</div>
+                        <div class="caja-amount" id="cajaTotal">S/ 0.00</div>
+                        <div class="caja-label">Total recaudado</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    💡 <strong>Cuadre de caja:</strong> Compara estos saldos con el efectivo físico y el extracto bancario. Si hay diferencias, revisa los pagos registrados.
+                </div>
+
+                <div style="display:flex;gap:var(--space-md);margin:var(--space-lg) 0;">
+                    <button class="btn btn-primary" onclick="abrirModalCierreCaja()">🔒 Realizar Cierre de Caja</button>
+                    <button class="btn btn-outline" onclick="verHistorialCierres()">📋 Ver Historial de Cierres</button>
+                </div>
+
+                <div class="card" style="margin-top:var(--space-lg);">
+                    <div class="card-header">
+                        <span class="card-icon">📋</span>
+                        <div>
+                            <div class="card-title">Movimientos de Caja</div>
+                            <div class="card-subtitle">Detalle de ingresos por tipo</div>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Préstamo</th>
+                                <th>Total</th>
+                                <th>Efectivo</th>
+                                <th>Cuenta</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tablaCaja">
+                            <tr><td colspan="6" style="text-align:center;">Sin movimientos</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modalManual" class="modal-backdrop">
+                <div class="modal" style="max-width:450px;">
+                    <div class="modal-header">
+                        <h3>✍️ Registro Manual</h3>
+                        <button class="modal-close" onclick="cerrarModalManual()">×</button>
+                    </div>
+                    <p class="muted" style="margin-bottom:var(--space-md);">Use cuando la API no esté disponible</p>
+
+                    <div class="form-group">
+                        <label>Tipo de documento</label>
+                        <select id="manualTipo">
+                            <option value="DNI">DNI (8 dígitos)</option>
+                            <option value="RUC">RUC (11 dígitos)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de documento *</label>
+                        <input type="text" id="manualDocumento" placeholder="Número">
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre completo *</label>
+                        <input type="text" id="manualNombre" placeholder="Nombre o razón social">
+                    </div>
+                    <div class="form-group">
+                        <label>Dirección</label>
+                        <input type="text" id="manualDireccion" placeholder="Opcional">
+                    </div>
+
+                    <button class="btn btn-primary btn-block" onclick="registrarManual()">✅ Registrar Cliente</button>
+                </div>
+            </div>
+
+            <div id="modalPago" class="modal-backdrop">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>💵 Registrar Pago</h3>
+                        <button class="modal-close" onclick="cerrarModalPago()">×</button>
+                    </div>
+
+                    <div id="pagoInfo" class="alert alert-info" style="margin-bottom:var(--space-md);"></div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha de pago</label>
+                            <input type="date" id="pagoFecha">
+                        </div>
+                        <div class="form-group">
+                            <label>Cuota base (S/)</label>
+                            <input type="number" id="pagoCuotaBase" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mora calculada (1% mensual sobre deuda)</label>
+                        <input type="number" id="pagoMora" readonly>
+                        <small class="muted" id="pagoMoraDetalle"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Total a pagar (S/) <span class="hint">Puede ajustar</span></label>
+                        <input type="number" id="pagoTotal" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Selecciona método de pago</label>
+                    </div>
+
+                    <div class="payment-methods">
+                        <div class="payment-method active" id="method-efectivo" onclick="selectPaymentMethodInModal('efectivo')">
+                            <div class="payment-method-header">
+                                <div class="payment-icon">💵</div>
+                                <div class="payment-info">
+                                    <h3>Efectivo / Transferencia</h3>
+                                    <p>Pago tradicional</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="payment-method" id="method-card-modal" onclick="selectPaymentMethodInModal('card')">
+                            <div class="payment-method-header">
+                                <div class="payment-icon">💳</div>
+                                <div class="payment-info">
+                                    <h3>Tarjeta de Crédito/Débito</h3>
+                                    <p>Paga con Visa, Mastercard, etc.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="efectivo-section">
+                        <div class="card" style="padding:var(--space-md);margin:var(--space-md) 0;">
+                            <label style="display:block;margin-bottom:var(--space-sm);font-weight:700;">📊 Distribución del pago</label>
+                            <div class="form-row">
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label style="font-size:0.8rem;">💵 Efectivo</label>
+                                    <input type="number" id="pagoEfectivo" step="0.01" oninput="validarDistribucion()">
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label style="font-size:0.8rem;">🏦 Cuenta/Tarjeta</label>
+                                    <input type="number" id="pagoCuenta" step="0.01" oninput="validarDistribucion()">
+                                </div>
+                            </div>
+                            <small class="muted">Efectivo + Cuenta debe ser igual al total</small>
+                            <div id="pagoDistError" class="alert alert-error hidden" style="margin-top:var(--space-sm);"></div>
+                        </div>
+
+                        <button class="btn btn-primary btn-block btn-lg" onclick="confirmarPago()">
+                            ✅ Confirmar Pago y Generar Comprobante
+                        </button>
+                    </div>
+
+                    <div id="card-section" class="hidden">
+                        <div class="alert alert-info" style="margin:var(--space-md) 0;">
+                            💡 <strong>Pago con tarjeta:</strong> El pago se realizará en el sitio web de Mercado Pago.
+                        </div>
+
+
+                        <div id="form-checkout-modal"></div>
+
+                        <button class="btn btn-outline btn-block" onclick="selectPaymentMethodInModal('efectivo')" style="margin-top:var(--space-md);">
+                            ← Volver a efectivo/transferencia
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modalCronograma" class="modal-backdrop">
+                <div class="modal" style="max-width:800px;">
+                    <div class="modal-header">
+                        <h3>📋 Cronograma de Pagos Préstamo N° <span id="cronogramaModalId"></span></h3>
+                        <button class="modal-close" onclick="cerrarModalCronograma()">×</button>
+                    </div>
+
+                    <div id="cronogramaInfo" style="margin-bottom:var(--space-md);"></div>
+
+                    <div class="table-wrap">
+                        <table id="tablaCronogramaModal">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Fecha</th>
+                                <th>Cuota</th>
+                                <th>Interés</th>
+                                <th>Amortización</th>
+                                <th>Saldo</th>
+                                <th>Estado</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <div style="display:flex;gap:var(--space-md);margin-top:var(--space-lg);flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="imprimirCronograma()">🖨️ Imprimir</button>
+                        <button class="btn btn-outline" onclick="cerrarModalCronograma()">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modalComprobante" class="modal-backdrop">
+                <div class="modal" style="max-width:420px;background:white;">
+                    <div id="comprobanteContenido"></div>
+                    <div style="display:flex;gap:var(--space-md);margin-top:var(--space-md);">
+                        <button class="btn btn-primary" onclick="imprimirComprobante()" style="flex:1;">🖨️ Imprimir</button>
+                        <button class="btn btn-outline" onclick="cerrarModalComprobante()" style="flex:1;color:#333;border-color:#ccc;">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modalTerminos" class="modal-backdrop">
+                <div class="modal" style="max-width:700px;">
+                    <div class="modal-header">
+                        <h3>📜 Términos y Condiciones</h3>
+                        <button class="modal-close" onclick="cerrarModalTerminos()">×</button>
+                    </div>
+                    <div style="max-height:60vh;overflow-y:auto;font-size:0.9rem;color:var(--text-muted);">
+                        <h4 style="color:var(--gold);margin:var(--space-md) 0 var(--space-sm);">1. Marco Legal</h4>
+                        <ul style="margin-left:var(--space-lg);margin-bottom:var(--space-md);">
+                            <li>Ley N° 26702 - Ley General del Sistema Financiero</li>
+                            <li>Resolución SBS N° 3274-2017 - Reglamento de Conducta de Mercado</li>
+                            <li>Circular BCRP - Tasa máxima 115.14% TEA (MN)</li>
+                            <li>Código de Protección y Defensa del Consumidor</li>
+                        </ul>
+
+                        <h4 style="color:var(--gold);margin:var(--space-md) 0 var(--space-sm);">2. Tasas y Mora</h4>
+                        <ul style="margin-left:var(--space-lg);margin-bottom:var(--space-md);">
+                            <li>La TEA no excederá el límite BCRP vigente (115.14%)</li>
+                            <li>Mora: 1% mensual sobre el saldo de la deuda</li>
+                            <li>No se cobran comisiones ocultas</li>
+                        </ul>
+
+                        <h4 style="color:var(--gold);margin:var(--space-md) 0 var(--space-sm);">3. Debida Diligencia (PEP)</h4>
+                        <ul style="margin-left:var(--space-lg);margin-bottom:var(--space-md);">
+                            <li>Resolución SBS N° 4349-2016 modificada por Res. 00199-2025</li>
+                            <li>Verificación de origen de fondos para PEP</li>
+                        </ul>
+
+                        <h4 style="color:var(--gold);margin:var(--space-md) 0 var(--space-sm);">4. Derechos del Cliente</h4>
+                        <ul style="margin-left:var(--space-lg);margin-bottom:var(--space-md);">
+                            <li>Recibir cronograma completo antes del desembolso</li>
+                            <li>Realizar pagos anticipados sin penalización</li>
+                            <li>Recibir comprobante por cada pago</li>
+                        </ul>
+
+                        <h4 style="color:var(--gold);margin:var(--space-md) 0 var(--space-sm);">5. Protección de Datos</h4>
+                        <p>Datos protegidos según Ley N° 29733. Solo uso para fines del préstamo.</p>
+                    </div>
+                    <button class="btn btn-primary btn-block" style="margin-top:var(--space-lg);" onclick="cerrarModalTerminos()">Entendido</button>
+                </div>
+            </div>
+
+            <div id="modalCierreCaja" class="modal-backdrop">
+                <div class="modal" style="max-width:600px;">
+                    <div class="modal-header">
+                        <h3>🔒 Cierre de Caja</h3>
+                        <button class="modal-close" onclick="cerrarModalCierreCaja()">×</button>
+                    </div>
+
+                    <div class="alert alert-info" style="margin-bottom:var(--space-lg);">
+                        💡 <strong>Importante:</strong> El cierre reseteará los saldos a cero. Verifique que los montos físicos coincidan con el sistema.
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha del cierre</label>
+                        <input type="date" id="cierreFecha" readonly>
+                    </div>
+
+                    <div class="card" style="padding:var(--space-md);margin-bottom:var(--space-md);background:var(--bg-dark);">
+                        <h4 style="color:var(--gold);margin-bottom:var(--space-sm);">💻 Según Sistema</h4>
+                        <div class="form-row">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label style="font-size:0.8rem;">💵 Efectivo</label>
+                                <input type="number" id="cierreSistemaEfectivo" readonly>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label style="font-size:0.8rem;">🏦 Cuenta</label>
+                                <input type="number" id="cierreSistemaCuenta" readonly>
+                            </div>
+                        </div>
+                        <p style="margin-top:var(--space-sm);text-align:right;"><strong>Total: <span id="cierreSistemaTotal">S/ 0.00</span></strong></p>
+                    </div>
+
+                    <div class="card" style="padding:var(--space-md);margin-bottom:var(--space-md);">
+                        <h4 style="color:var(--gold);margin-bottom:var(--space-sm);">📦 Conteo Físico</h4>
+                        <div class="form-row">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label style="font-size:0.8rem;">💵 Efectivo contado</label>
+                                <input type="number" id="cierreFisicoEfectivo" step="0.01" oninput="calcularDiferenciasCierre()">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label style="font-size:0.8rem;">🏦 Saldo bancario</label>
+                                <input type="number" id="cierreFisicoCuenta" step="0.01" oninput="calcularDiferenciasCierre()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="padding:var(--space-md);margin-bottom:var(--space-md);background:var(--bg-dark);">
+                        <h4 style="color:var(--gold);margin-bottom:var(--space-sm);">📊 Diferencias</h4>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-xs);">
+                            <span>Efectivo:</span>
+                            <strong id="cierreDifEfectivo">S/ 0.00</strong>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-xs);">
+                            <span>Cuenta:</span>
+                            <strong id="cierreDifCuenta">S/ 0.00</strong>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding-top:var(--space-sm);border-top:1px solid var(--border);">
+                            <span><strong>Total:</strong></span>
+                            <strong id="cierreDifTotal" style="font-size:1.1rem;">S/ 0.00</strong>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Observaciones</label>
+                        <textarea id="cierreObservaciones" rows="3" placeholder="Anote cualquier observación sobre diferencias o incidencias..."></textarea>
+                    </div>
+
+                    <button class="btn btn-primary btn-block btn-lg" onclick="confirmarCierreCaja()">
+                        ✅ Confirmar Cierre de Caja
+                    </button>
+                </div>
+            </div>
+
+            <div id="modalHistorialCierres" class="modal-backdrop">
+                <div class="modal" style="max-width:900px;">
+                    <div class="modal-header">
+                        <h3>📋 Historial de Cierres de Caja</h3>
+                        <button class="modal-close" onclick="cerrarModalHistorialCierres()">×</button>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table id="tablaHistorialCierres">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Fecha</th>
+                                <th>Usuario</th>
+                                <th>Total</th>
+                                <th>Efectivo</th>
+                                <th>Cuenta</th>
+                                <th>Diferencia</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr><td colspan="8" style="text-align:center;">Sin cierres registrados</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modalDetalleCierre" class="modal-backdrop">
+                <div class="modal" style="max-width:420px;background:white;">
+                    <div id="detalleCierreContenido"></div>
+                    <div style="display:flex;gap:var(--space-md);margin-top:var(--space-md);">
+                        <button class="btn btn-primary" onclick="window.print()" style="flex:1;">🖨️ Imprimir</button>
+                        <button class="btn btn-outline" onclick="cerrarModalDetalleCierre()" style="flex:1;color:#333;border-color:#ccc;">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
